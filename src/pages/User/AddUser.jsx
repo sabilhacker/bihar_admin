@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Select, MenuItem, Button, Grid, InputLabel, FormControl } from '@mui/material';
-import Swal from 'sweetalert2';
 import InputField from '../../components/InputField'; // Update the path as per your project structure
-import { registerUser } from '../../Api/user';
 
 const AddUser = () => {
   const [formData, setFormData] = useState({

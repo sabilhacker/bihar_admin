@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import {  useLocation } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
-// mock
-import account from '../../_mock/account';
-// hooks
+import { Box, Drawer } from '@mui/material';
+
 import useResponsive from '../../hooks/useResponsive';
 // components
 import Logo from '../../components/Logo';
@@ -14,7 +12,6 @@ import Scrollbar from '../../components/Scrollbar';
 import NavSection from '../../components/NavSection';
 //
 import navConfig from './NavConfig';
-import logo from "../../assest/logo.png"
 // ----------------------------------------------------------------------
 
 const DRAWER_WIDTH = 280;
@@ -26,13 +23,13 @@ const RootStyle = styled('div')(({ theme }) => ({
   },
 }));
 
-const AccountStyle = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(2, 2.5),
-  borderRadius: Number(theme.shape.borderRadius) * 1.5,
-  backgroundColor: theme.palette.blue[500_12],
-}));
+// const AccountStyle = styled('div')(({ theme }) => ({
+//   display: 'flex',
+//   alignItems: 'center',
+//    padding: theme.spacing(2, 2.5),
+//   borderRadius: Number(theme.shape.borderRadius) * 1.5,
+//   backgroundColor: theme.palette.blue[500_12],
+// }));
 
 // ----------------------------------------------------------------------
 
@@ -79,7 +76,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
       </Box> */}
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "20px" }}>
-        <img height={75} width={75} src={logo} alt='logo' />
+        <img height={75} width={75} src={Logo} alt='logo' />
         <h1 style={{ color: "#3C4469", lineHeight: 1 }}><strong>Samastipur Loksabha</strong></h1>
       </div>
 

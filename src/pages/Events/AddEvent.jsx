@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Button, Container, TextField, Typography, Grid, IconButton } from '@mui/material';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
+import { Box, Button, Container, Typography, Grid } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import Swal from 'sweetalert2';
 import InputField from '../../components/InputField'; // Update the path as per your project structure
 import { addEvent } from '../../Api/event';
 // import axios from 'axios';.s

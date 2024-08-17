@@ -214,7 +214,7 @@
 
 import React from 'react';
 import { Box, Grid, Card, CardContent, Typography, Button } from '@mui/material';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell } from 'recharts';
 import cardImg1 from "../assest/activity_1.png"
 import cardImg2 from "../assest/ic_customer.png"
 
@@ -225,15 +225,11 @@ const dataPie = [
   { name: 'Rejected', value: 7 },
 ];
 
-const dataBar = [
-  { name: 'Total Users', uv: 175458, pv: 2400, amt: 2400 },
-  { name: 'Active', uv: 175451, pv: 1398, amt: 2210 },
-  { name: 'Inactive', uv: 7, pv: 9800, amt: 2290 },
-];
+
 
 const COLORS = ['#000091', '#DA0003', '#027402'];
 
-const DashboardApp = () => {
+function DashboardApp ()  {
   return (
     <Box sx={{ padding: 1 }}>
       <Typography variant="h4" gutterBottom>

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types'; // Import PropTypes
 import { InputLabel, OutlinedInput } from '@mui/material';
 
 function InputField({ value, onChange, placeholder, sx, label, multiline, rows, sxLabel, name, type }) {
@@ -36,5 +37,31 @@ function InputField({ value, onChange, placeholder, sx, label, multiline, rows, 
         </div>
     );
 }
+
+// Add PropTypes validation
+InputField.propTypes = {
+    value: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]).isRequired,
+    onChange: PropTypes.func.isRequired,
+    placeholder: PropTypes.string,
+    sx: PropTypes.object,
+    label: PropTypes.string.isRequired,
+    multiline: PropTypes.bool,
+    rows: PropTypes.number,
+    sxLabel: PropTypes.object,
+    name: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+};
+
+// Set default props for optional props
+InputField.defaultProps = {
+    placeholder: '',
+    sx: {},
+    multiline: false,
+    rows: 1,
+    sxLabel: {},
+};
 
 export default InputField;

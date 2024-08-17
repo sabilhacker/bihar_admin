@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Box, Button, Container, Typography, Paper } from '@mui/material';
-import Swal from 'sweetalert2';
 import { getUsers, removeUser } from '../../Api/user';
 import InputField from '../../components/InputField'; // Update the path according to your project structure
 

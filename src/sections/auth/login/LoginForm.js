@@ -1,4 +1,3 @@
-import * as Yup from 'yup';
 import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useFormik, Form, FormikProvider } from 'formik';
@@ -7,7 +6,6 @@ import { Link, Stack, Checkbox, TextField, IconButton, InputAdornment, FormContr
 import { LoadingButton } from '@mui/lab';
 // component
 import Iconify from '../../../components/Iconify';
-import { loginUser } from '../../../Api/login';
 
 
 
@@ -16,10 +14,10 @@ export default function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const LoginSchema = Yup.object().shape({
-    phoneNum: Yup.string().matches(/^[0-9]{10}$/, 'Phone number must be exactly 10 digits').required('Phone Number is required'),
-    fcmToken: Yup.string().required('FCM-Token is required'),
-  });
+  // const LoginSchema = Yup.object().shape({
+  //   phoneNum: Yup.string().matches(/^[0-9]{10}$/, 'Phone number must be exactly 10 digits').required('Phone Number is required'),
+  //   fcmToken: Yup.string().required('FCM-Token is required'),
+  // });
 
   const formik = useFormik({
     initialValues: {

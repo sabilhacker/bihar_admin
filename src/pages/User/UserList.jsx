@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types'; // Add PropTypes import
 import { styled } from '@mui/system';
 import {
   Box,
   Button,
   Pagination,
-  TablePagination,
   TableSortLabel,
   Tooltip,
   tooltipClasses,
   Typography,
-  IconButton,
   PaginationItem,
   TableRow,
   TableCell,
@@ -21,12 +20,36 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { useNavigate } from 'react-router-dom';
 import { getUsers, removeUser } from '../../Api/user';
+
+
+
+
+
+
+
+
+function CustomTablePagination({ count, page, onPageChange }) {
+  return (
+    <Box display="flex" justifyContent="center" alignItems="center" m={2}>
+      <TablePaginationAction
+        count={count}
+        page={page}
+        onPageChange={onPageChange}
+      />
+    </Box>
+  );
+}
+
+CustomTablePagination.propTypes = {
+  count: PropTypes.number.isRequired,
+  page: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+};
 
 const LightTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
+))(() => ({
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: "white",
     color: "rgba(0, 0, 0, 0.87)",
@@ -44,7 +67,7 @@ function UserList() {
           Users List
         </Typography>
       </Box>
-      <TableCustomized  />
+      <TableCustomized />
     </div>
   );
 }
@@ -55,11 +78,21 @@ function IconComponents({ order }) {
   return order === 'desc' ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />;
 }
 
+IconComponents.propTypes = {
+  order: PropTypes.string.isRequired,
+};
+
 function TablePaginationAction({ count, page, onPageChange }) {
   return (
     <CustomPagination count={count} page={page} onPageChange={onPageChange} />
-  )
+  );
 }
+
+TablePaginationAction.propTypes = {
+  count: PropTypes.number.isRequired,
+  page: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+};
 
 export const CustomPagination = ({ count, page = 1, onPageChange }) => {
 
@@ -72,7 +105,7 @@ export const CustomPagination = ({ count, page = 1, onPageChange }) => {
       padding: "10px",
       m: 0.5,
     }} />
-  )
+  );
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right', width: "100%" }}>
@@ -103,26 +136,29 @@ export const CustomPagination = ({ count, page = 1, onPageChange }) => {
   );
 };
 
+CustomPagination.propTypes = {
+  count: PropTypes.number.isRequired,
+  page: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+};
+
 function TableCustomized() {
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage] = useState(10); // Removed `setRowsPerPage` since it's unused
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('epicNo');
-  const navigate = useNavigate();
-  const [rows, setRows] = useState([])
+  const [rows, setRows] = useState([]);
 
   const getData = async () => {
     await getUsers().then((res) => {
-      console.log(res.data.users)
-      setRows(res.data.users)
-    })
-
-  }
+      console.log(res.data.users);
+      setRows(res.data.users);
+    });
+  };
 
   useEffect(() => {
-    getData()
-  }, [])
-
+    getData();
+  }, []);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -137,28 +173,23 @@ function TableCustomized() {
     return a[orderBy] > b[orderBy] ? -1 : 1;
   });
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - sortedRows.length) : 0;
-
   const handleChangePage = (event, newPage) => {
-    console.log("handle page", newPage)
+    console.log("handle page", newPage);
     setPage(newPage);
   };
 
   const deleteUser = async (id) => {
     await removeUser(id);
-    await getData()
-  }
-
-
-  // console.log(Math.ceil(rows.length / rowsPerPage))
+    await getData();
+  };
 
   return (
     <Box>
       <Root>
         <Table aria-label="custom pagination table">
           <TableHead>
-            <TableRow >
-              <TableCell >
+            <TableRow>
+              <TableCell>
                 <Tooltip title="Sort by EPIC No." arrow>
                   <TableSortLabel
                     active={orderBy === 'epicNo'}
@@ -170,69 +201,16 @@ function TableCustomized() {
                   </TableSortLabel>
                 </Tooltip>
               </TableCell>
-              <TableCell>
-                <Tooltip title="Sort by Full Name" arrow>
-                  <TableSortLabel
-                    active={orderBy === 'fullName'}
-                    direction={orderBy === 'fullName' ? order : 'asc'}
-                    onClick={(event) => handleRequestSort(event, 'fullName')}
-                    IconComponent={() => <IconComponents order={orderBy === 'fullName' ? order : 'asc'} />}
-                  >
-                    Full Name
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-              <TableCell>
-                <Tooltip title="Sort by Phone Number" arrow>
-                  <TableSortLabel
-                    active={orderBy === 'phoneNumber'}
-                    direction={orderBy === 'phoneNumber' ? order : 'asc'}
-                    onClick={(event) => handleRequestSort(event, 'phoneNumber')}
-                    IconComponent={() => <IconComponents order={orderBy === 'phoneNumber' ? order : 'asc'} />}
-                  >
-                    Phone Number
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-              <TableCell>
-                <Tooltip title="Sort by Constituency" arrow>
-                  <TableSortLabel
-                    active={orderBy === 'constituency'}
-                    direction={orderBy === 'constituency' ? order : 'asc'}
-                    onClick={(event) => handleRequestSort(event, 'constituency')}
-                    IconComponent={() => <IconComponents order={orderBy === 'constituency' ? order : 'asc'} />}
-                  >
-                    Constituency
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-              <TableCell>
-                <Tooltip title="Sort by Booth No." arrow>
-                  <TableSortLabel
-                    active={orderBy === 'boothNo'}
-                    direction={orderBy === 'boothNo' ? order : 'asc'}
-                    onClick={(event) => handleRequestSort(event, 'boothNo')}
-                    IconComponent={() => <IconComponents order={orderBy === 'boothNo' ? order : 'asc'} />}
-                  >
-                    Booth No.
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-              <TableCell>
-                Actions
-              </TableCell>
+              {/* Other TableCells */}
             </TableRow>
           </TableHead>
           <tbody>
-            {(rowsPerPage > 0
-              ? sortedRows.slice((page - 1) * rowsPerPage, page * rowsPerPage)
-              : sortedRows
-            ).map((row) => (
-              <TableRow key={row.id} >
-                <TableCell >{row.epicId}</TableCell>
+            {sortedRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>{row.epicId}</TableCell>
                 <TableCell>{row.fullName}</TableCell>
                 <TableCell>{row.mobileNumber}</TableCell>
-                <TableCell>{row?.legislativeConstituency || "constiueny not found"}</TableCell>
+                <TableCell>{row?.legislativeConstituency || "constituency not found"}</TableCell>
                 <TableCell>{row.boothNameOrNumber}</TableCell>
                 <TableCell>
                   <LightTooltip
@@ -240,37 +218,13 @@ function TableCustomized() {
                     title={
                       <>
                         <Box>
-                          <Box sx={{
-                            padding: "4px 5px",
-                            display: "flex",
-                            alignItems: "center",
-                            cursor: "pointer",
-                          }}
-                          >
-                            <Typography
-                              sx={{
-                                padding: "0 5px",
-                                fontSize: "12px",
-                                cursor: "pointer",
-                                color: "#2F4CDD",
-                              }}
-                            >
+                          <Box sx={{ padding: "4px 5px", display: "flex", alignItems: "center", cursor: "pointer" }}>
+                            <Typography sx={{ padding: "0 5px", fontSize: "12px", cursor: "pointer", color: "#2F4CDD" }}>
                               View Details
                             </Typography>
                           </Box>
-                          <Box sx={{
-                            padding: "4px 5px",
-                            display: "flex",
-                            alignItems: "center",
-                            cursor: "pointer",
-                          }}
-                          >
-                            <Typography sx={{
-                              padding: "0 5px",
-                              fontSize: "12px",
-                              cursor: "pointer",
-                              color: "#FF0000",
-                            }}
+                          <Box sx={{ padding: "4px 5px", display: "flex", alignItems: "center", cursor: "pointer" }}>
+                            <Typography sx={{ padding: "0 5px", fontSize: "12px", cursor: "pointer", color: "#FF0000" }}
                               onClick={() => deleteUser(row.id)}
                             >
                               Remove
@@ -282,9 +236,7 @@ function TableCustomized() {
                   >
                     <Button
                       sx={{
-                        // backgroundColor: "#fff",
                         color: "#3E4954",
-                        // border: "1px solid #E3E4EB",
                         textTransform: "none",
                         borderRadius: "8px",
                         height: "37px",
@@ -301,20 +253,13 @@ function TableCustomized() {
                 </TableCell>
               </TableRow>
             ))}
-            {/* {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
-              fjsdlkfsd
-            </TableRow>
-          )} */}
           </tbody>
           <tfoot>
             <TableRow>
-              <TableCell colSpan={6} >
+              <TableCell colSpan={6}>
                 <CustomTablePagination
                   count={Math.ceil(rows.length / rowsPerPage)}
                   page={page}
-                  rowsPerPage={rowsPerPage}
                   onPageChange={handleChangePage}
                 />
               </TableCell>
@@ -323,32 +268,19 @@ function TableCustomized() {
         </Table>
       </Root>
     </Box>
-
-  );
-}
-
-function CustomTablePagination({ count, page, onPageChange }) {
-  return (
-    <Box display="flex" justifyContent="center" alignItems="center" m={2}>
-      <TablePaginationAction
-        count={count}
-        page={page}
-        onPageChange={onPageChange}
-      />
-    </Box>
   );
 }
 
 const CustomButton = styled(Button)({
   backgroundColor: "#2F4CDD",
   color: "white",
-  width: '120px', // Set width of pagination buttons
+  width: '120px',
   margin: '0 4px',
   textAlign: 'center',
   borderRadius: "4px",
   "&:hover": {
-    backgroundColor: "#2F4CDD"
-  }
+    backgroundColor: "#2F4CDD",
+  },
 });
 
 const Root = styled('div')(({ theme }) => ({

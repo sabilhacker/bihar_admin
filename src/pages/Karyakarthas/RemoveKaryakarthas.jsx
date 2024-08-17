@@ -2,10 +2,10 @@
 
 
 import React from 'react';
-import { Box, Button, Container, TextField, Typography, Grid, Paper } from '@mui/material';
+import { Box, Button, Container, Typography, Paper } from '@mui/material';
 import InputField from '../../components/InputField';
 
-const RemoveKaryakarthas = () => {
+function RemoveKaryakarthas ()  {
   return (
     <Container maxWidth="lg" style={{ marginTop: '10px' }}>
       <Typography variant="h5" gutterBottom>
