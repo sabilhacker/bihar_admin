@@ -25,7 +25,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { getUsers, removeUser } from '../../Api/user';
-import { deleteEvent, getEvents, updateStatus } from '../../Api/event';
+import { deleteEvent, getEvents } from '../../Api/event';
 
 const LightTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
