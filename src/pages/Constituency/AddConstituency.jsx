@@ -1,61 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper, List, ListItem, ListItemText, Button, CircularProgress } from '@mui/material';
-import { getConstituencies } from '../../Api/constituencies'; // Adjust the import path according to your project structure
+import React, { useState } from 'react';
+import { Box, Button, Container, Typography, Paper } from '@mui/material';
+import Swal from 'sweetalert2';
 
-function ConstituencyList() {
-  const [constituencies, setConstituencies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+import { createConstituencies } from '../../Api/constituencies'; // Adjust the import paths as per your project structure
+import InputField from '../../components/InputField'; // Update the path according to your project structure
 
-  useEffect(() => {
-    const fetchConstituencies = async () => {
-      try {
-        const response = await getConstituencies();
-        console.log('Fetched Constituencies:', response); // Log the full response to debug
-        setConstituencies(response.data.data); // Adjust based on the structure of the API response
-        setLoading(false);
-      } catch (err) {
-        console.error('Failed to fetch constituencies:', err);
-        setError('Failed to fetch constituencies');
-        setLoading(false);
-      }
-    };
+const AddConstituencies = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+  });
 
-    fetchConstituencies();
-  }, []);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
-  if (error) {
-    return <Typography color="error">{error}</Typography>;
-  }
+  const handleCreate = async () => {
+    try {
+      await createConstituencies(formData.name);
+      Swal.fire("Success", "Constituency added successfully", "success");
+      setFormData({ name: '' }); // Clear the input field after creation
+    } catch (err) {
+      console.error('Error creating constituency:', err);
+      Swal.fire("Error", "Failed to add constituency", "error");
+    }
+  };
 
   return (
-    <Box sx={{ marginTop: '20px' }}>
+    <Container maxWidth="lg" style={{ marginTop: '10px' }}>
       <Typography variant="h5" gutterBottom>
-        Constituency List
+        Add Constituency
       </Typography>
-      <Paper elevation={3} sx={{ padding: '20px', borderRadius: '8px' }}>
-        {constituencies.length > 0 ? (
-          <List>
-            {constituencies.map((constituency, index) => {
-              console.log('Rendering Constituency:', constituency); // Log each item to ensure it's being processed correctly
-              return (
-                <ListItem key={constituency.id || index} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <ListItemText primary={constituency.name} />
-                  <Button variant="contained" color="primary">Details</Button>
-                </ListItem>
-              );
-            })}
-          </List>
-        ) : (
-          <Typography>No constituencies found</Typography>
-        )}
-      </Paper>
-    </Box>
-  );
-}
 
-export default ConstituencyList;
+      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+        <Box sx={{ padding: '20px', border: '1px solid black', borderRadius: '8px', width: "50%" }}>
+          <Typography variant="h6" gutterBottom>
+            Enter Constituency Details
+          </Typography>
+          <Box>
+            <InputField
+              fullWidth
+              label="Constituency Name"
+              placeholder="Enter Constituency Name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              variant="outlined"
+              margin="normal"
+            />
+          </Box>
+          <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+            <Button variant="contained" color="primary" size="large" onClick={handleCreate}>
+              Add Constituency
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    </Container>
+  );
+};
+
+export default AddConstituencies;

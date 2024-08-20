@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types'; // Add PropTypes import
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { styled } from '@mui/system';
 import {
   Box,
@@ -20,6 +20,7 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { getUsers, removeUser } from '../../Api/user'; // Assuming you have the API functions in a file named api.js
 
 const LightTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -33,6 +34,45 @@ const LightTooltip = styled(({ className, ...props }) => (
 }));
 
 function KaryakarthasList() {
+  const [users, setUsers] = useState([]); // Initialize as an empty array
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 5;
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await getUsers('', page, rowsPerPage);
+        console.log('API response:', response);
+        
+        if (response.data && Array.isArray(response.data.users)) {
+          setUsers(response.data.users); // Extract the users array
+        } else {
+          console.error('Expected an array but got:', response.data);
+          setUsers([]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+        setUsers([]);
+      }
+    };
+
+    fetchUsers();
+  }, [page]);
+
+  const handleRemoveUser = async (userId) => {
+    try {
+      await removeUser(userId);
+      setUsers(users.filter(user => user.id !== userId));
+    } catch (err) {
+      console.error('Failed to remove user:', err);
+    }
+  };
+
+  if (!Array.isArray(users)) {
+    console.error('users is not an array:', users);
+    return <div>Error: User data is not in the expected format.</div>;
+  }
+
   return (
     <div>
       <Box sx={{ p: 2 }}>
@@ -40,7 +80,7 @@ function KaryakarthasList() {
           Karyakarthas List
         </Typography>
       </Box>
-      <TableCustomized />
+      <TableCustomized users={users} onRemoveUser={handleRemoveUser} />
     </div>
   );
 }
@@ -55,76 +95,9 @@ IconComponents.propTypes = {
   order: PropTypes.string.isRequired,
 };
 
-function TablePaginationAction({ count, page, onPageChange }) {
-  return (
-    <CustomPagination count={count} page={page} onPageChange={onPageChange} />
-  );
-}
-
-TablePaginationAction.propTypes = {
-  count: PropTypes.number.isRequired,
-  page: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-};
-
-export const CustomPagination = ({ count, page = 1, onPageChange }) => {
-
-  const renderItem = (item) => (
-    <PaginationItem {...item} sx={{
-      backgroundColor: item.page === page ? "white !important" : "transparent",
-      borderColor: item.page === page ? "white" : "#E3E4EB",
-      color: item.page === page ? "black" : "blue",
-      borderRadius: "5px",
-      padding: "10px",
-      m: 0.5,
-    }} />
-  );
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right', width: "100%" }}>
-      <CustomButton
-        disabled={page === 1}
-        onClick={() => onPageChange(null, page - 1)}
-      >
-        <KeyboardDoubleArrowLeftIcon />Previous
-      </CustomButton>
-      <Pagination
-        count={count}
-        page={page}
-        renderItem={renderItem}
-        variant='outlined'
-        shape="rounded"
-        onChange={onPageChange}
-        hidePrevButton
-        hideNextButton
-        sx={{ mx: 2, backgroundColor: "#E3E4EB" }}
-      />
-      <CustomButton
-        disabled={page === count}
-        onClick={() => onPageChange(null, page + 1)}
-      >
-        Next<KeyboardDoubleArrowRightIcon />
-      </CustomButton>
-    </div>
-  );
-};
-
-CustomPagination.propTypes = {
-  count: PropTypes.number.isRequired,
-  page: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-};
-
-function TableCustomized() {
-  const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(5); // Removed setRowsPerPage as it's not used
+function TableCustomized({ users, onRemoveUser }) {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('epicNo');
-
-  const rows = [
-    createData('EPIC001', 'John Doe', '123-456-7890', 'Ward 1', '1', 'Edit/Delete'),
-    // ... more rows
-  ];
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -132,24 +105,20 @@ function TableCustomized() {
     setOrderBy(property);
   };
 
-  const sortedRows = [...rows].sort((a, b) => {
+  const sortedUsers = [...users].sort((a, b) => {
     if (order === 'asc') {
       return a[orderBy] < b[orderBy] ? -1 : 1;
     }
     return a[orderBy] > b[orderBy] ? -1 : 1;
   });
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
   return (
     <Box>
       <Root>
         <Table aria-label="custom pagination table">
           <TableHead>
-            <TableRow >
-              <TableCell >
+            <TableRow>
+              <TableCell>
                 <Tooltip title="Sort by EPIC No." arrow>
                   <TableSortLabel
                     active={orderBy === 'epicNo'}
@@ -165,16 +134,13 @@ function TableCustomized() {
             </TableRow>
           </TableHead>
           <tbody>
-            {(rowsPerPage > 0
-              ? sortedRows.slice((page - 1) * rowsPerPage, page * rowsPerPage)
-              : sortedRows
-            ).map((row) => (
-              <TableRow key={row.epicNo} >
-                <TableCell >{row.epicNo}</TableCell>
-                <TableCell>{row.fullName}</TableCell>
-                <TableCell>{row.phoneNumber}</TableCell>
-                <TableCell>{row.constituency}</TableCell>
-                <TableCell>{row.boothNo}</TableCell>
+            {sortedUsers.map((user) => (
+              <TableRow key={user.epicNo}>
+                <TableCell>{user.epicNo}</TableCell>
+                <TableCell>{user.fullName}</TableCell>
+                <TableCell>{user.phoneNumber}</TableCell>
+                <TableCell>{user.constituency}</TableCell>
+                <TableCell>{user.boothNo}</TableCell>
                 <TableCell>
                   <LightTooltip
                     placement='bottom-end'
@@ -205,12 +171,14 @@ function TableCustomized() {
                           cursor: "pointer",
                         }}
                         >
-                          <Typography sx={{
-                            padding: "0 5px",
-                            fontSize: "12px",
-                            cursor: "pointer",
-                            color: "#FF0000",
-                          }}
+                          <Typography
+                            sx={{
+                              padding: "0 5px",
+                              fontSize: "12px",
+                              cursor: "pointer",
+                              color: "#FF0000",
+                            }}
+                            onClick={() => onRemoveUser(user.id)} // Adjust according to your API response structure
                           >
                             Remove
                           </Typography>
@@ -238,56 +206,44 @@ function TableCustomized() {
               </TableRow>
             ))}
           </tbody>
-          <tfoot>
-            <TableRow>
-              <TableCell colSpan={6} >
-                <CustomTablePagination
-                  count={Math.ceil(rows.length / rowsPerPage)}
-                  page={page}
-                  onPageChange={handleChangePage}
-                />
-              </TableCell>
-            </TableRow>
-          </tfoot>
         </Table>
       </Root>
     </Box>
   );
 }
 
-function CustomTablePagination({ count, page, onPageChange }) {
+TableCustomized.propTypes = {
+  users: PropTypes.array.isRequired,
+  onRemoveUser: PropTypes.func.isRequired,
+};
+
+function CustomButton({ children, onClick, disabled }) {
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" m={2}>
-      <TablePaginationAction
-        count={count}
-        page={page}
-        onPageChange={onPageChange}
-      />
-    </Box>
+    <Button
+      onClick={onClick}
+      disabled={disabled}
+      sx={{
+        backgroundColor: "#2F4CDD",
+        color: "white",
+        width: '120px', // Set width of pagination buttons
+        margin: '0 4px',
+        textAlign: 'center',
+        borderRadius: "4px",
+        "&:hover": {
+          backgroundColor: "#2F4CDD"
+        }
+      }}
+    >
+      {children}
+    </Button>
   );
 }
 
-CustomTablePagination.propTypes = {
-  count: PropTypes.number.isRequired,
-  page: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
+CustomButton.propTypes = {
+  children: PropTypes.node.isRequired,
+  onClick: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
 };
-
-function createData(epicNo, fullName, phoneNumber, constituency, boothNo, actions) {
-  return { epicNo, fullName, phoneNumber, constituency, boothNo, actions };
-}
-
-const CustomButton = styled(Button)({
-  backgroundColor: "#2F4CDD",
-  color: "white",
-  width: '120px', // Set width of pagination buttons
-  margin: '0 4px',
-  textAlign: 'center',
-  borderRadius: "4px",
-  "&:hover": {
-    backgroundColor: "#2F4CDD"
-  }
-});
 
 const Root = styled('div')(({ theme }) => ({
   '& .MuiTableHead-root': {

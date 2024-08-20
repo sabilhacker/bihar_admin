@@ -1,130 +1,117 @@
-import React from 'react';
-import { Box, Button, Container, Typography, Paper } from '@mui/material';
-import InputField from '../../components/InputField';
+import React, { useState } from 'react';
+import { Box, Button, Container, Typography, Paper, CircularProgress, TextField } from '@mui/material';
+import { loginUser } from '../../Api/karyakarthas'; // Ensure this path is correct
 
-const AddKaryakartha = () => (
-  <Container maxWidth="lg" style={{ marginTop: '10px' }}>
-    <Typography variant="h5" gutterBottom>
-      Add New Karyakartha
-    </Typography>
+const AddKaryakartha = () => {
+  const [loginData, setLoginData] = useState({
+    phoneNum: '',
+    fcmToken: 'dummyToken',  // Replace with actual FCM token if available
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-    <Box sx={{ justifyContent: 'center', marginTop: '20px' }}>
-      <Typography variant="h6" gutterBottom sx={{ textAlign: "center" }}>
-        Search by
+  const handleChange = (e) => {
+    setLoginData({ ...loginData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const data = await loginUser(loginData);
+      setSuccessMessage('User logged in successfully');
+      // Handle further actions here, such as redirecting the user or saving tokens
+    } catch (error) {
+      setError('Failed to log in. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Container maxWidth="lg" style={{ marginTop: '20px' }}>
+      <Typography variant="h4" gutterBottom>
+        Add New Karyakartha
       </Typography>
-      <Box sx={{ padding: '20px', border: '1px solid black', borderRadius: '8px', width: "60%", margin: "0px auto" }}>
-        <Box>
-          <InputField
-            fullWidth
-            label="Full Name"
-            placeholder="Enter Full Name"
-            variant="outlined"
-            margin="normal"
-            sxLabel={{ marginTop: "20px" }}
-          />
-          <InputField
-            fullWidth
-            label="EPIC NUMBER"
-            placeholder="Enter EPIC Number"
-            variant="outlined"
-            margin="normal"
-            sxLabel={{ marginTop: "20px" }}
-          />
-        </Box>
 
-        <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
-          <Button variant="contained" sx={{ backgroundColor: "#007AFF" }} size="large">
-            Search
-          </Button>
-        </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
+        <Paper elevation={3} sx={{ padding: '30px', borderRadius: '8px', width: "50%" }}>
+          <Typography variant="h6" gutterBottom sx={{ textAlign: "center" }}>
+            Search by
+          </Typography>
+          <Box>
+            <TextField
+              fullWidth
+              label="Full Name"
+              placeholder="Enter Full Name"
+              name="fullName"
+              variant="outlined"
+              margin="normal"
+              value={loginData.phoneNum} // Assuming phoneNum is the full name field for simplicity
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              label="EPIC NUMBER"
+              placeholder="Enter EPIC Number"
+              name="epicNumber"
+              variant="outlined"
+              margin="normal"
+              value={loginData.fcmToken} // Assuming fcmToken is the epic number field for simplicity
+              onChange={handleChange}
+            />
+          </Box>
+
+          {error && (
+            <Typography color="error" sx={{ textAlign: 'center', marginTop: '10px' }}>
+              {error}
+            </Typography>
+          )}
+
+          {successMessage && (
+            <Typography color="success" sx={{ textAlign: 'center', marginTop: '10px' }}>
+              {successMessage}
+            </Typography>
+          )}
+
+          <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: "#007AFF", width: '100%' }}
+              size="large"
+              onClick={handleLogin}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Search'}
+            </Button>
+          </Box>
+        </Paper>
       </Box>
-    </Box>
 
-    <Box sx={{ marginTop: '40px' }}>
-      <Typography variant="h6" gutterBottom>
-        Results
-      </Typography>
-      <Paper elevation={3} sx={{ padding: '20px', minHeight: '200px', borderRadius: '8px' }}>
-        {/* Results will be displayed here */}
-      </Paper>
-    </Box>
+      <Box sx={{ marginTop: '40px' }}>
+        <Typography variant="h6" gutterBottom>
+          Results
+        </Typography>
+        <Paper elevation={3} sx={{ padding: '20px', minHeight: '200px', borderRadius: '8px' }}>
+          <Typography>No results to display</Typography>
+          {/* Here you can map through and display results */}
+        </Paper>
+      </Box>
 
-    <Box sx={{ textAlign: 'center', marginTop: '40px' }}>
-      <Button variant="contained" sx={{ backgroundColor: "#007AFF" }} size="large">
-        Add as Karyakartha
-      </Button>
-    </Box>
-  </Container>
-);
+      <Box sx={{ textAlign: 'center', marginTop: '40px' }}>
+        <Button
+          variant="contained"
+          sx={{ backgroundColor: "#007AFF", padding: '10px 30px', fontSize: '16px' }}
+          size="large"
+        >
+          Add as Karyakartha
+        </Button>
+      </Box>
+    </Container>
+  );
+};
 
 export default AddKaryakartha;
-
-
-
-
-// function TablePaginationActions(props) {
-//   const { count, page, rowsPerPage, onPageChange } = props;
-
-//   const handleFirstPageButtonClick = (event) => {
-//     onPageChange(event, 0);
-//   };
-
-//   const handleBackButtonClick = (event) => {
-//     onPageChange(event, page - 1);
-//   };
-
-//   const handleNextButtonClick = (event) => {
-//     onPageChange(event, page + 1);
-//   };
-
-//   const handleLastPageButtonClick = (event) => {
-//     onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-//   };
-
-//   const handlePageButtonClick = (newPage) => {
-//     onPageChange(null, newPage);
-//   };
-
-//   const totalPages = Math.ceil(count / rowsPerPage);
-
-//   return (
-//     <div style={{ display: 'flex', alignItems: 'center', border: "1px solid red", width: "50%" }}>
-//       <CustomButton
-//         onClick={handleBackButtonClick}
-//         disabled={page === 0}
-//         aria-label="previous page"
-//       >
-//         Previous Page
-//         <ChevronLeftRoundedIcon />
-//       </CustomButton>
-
-//       <div style={{ display: 'flex', alignItems: 'center', backgroundColor: "#E3E4EB" }}>
-//         <CustomPagination count={7} />
-//         {Array.from({ length: totalPages }, (_, index) => (
-//           <CustomButton
-//             key={index}
-//             onClick={() => handlePageButtonClick(index)}
-//             disabled={index === page}
-//             aria-label={`page ${index + 1}`}
-//             style={{
-//               fontWeight: index === page ? 'bold' : 'normal',
-//               backgroundColor: index === page ? 'white' : 'transparent',
-//               color: index === page ? "black" : "#2F4CDD"
-//             }}
-//           >
-//             {index + 1}
-//           </CustomButton>
-//         ))}
-//       </div>
-
-//       <CustomButton
-//         onClick={handleNextButtonClick}
-//         disabled={page >= totalPages - 1}
-//         aria-label="next page"
-//       >
-//         Next Page <ChevronRightRoundedIcon />
-//       </CustomButton>
-//     </div>
-
-//   );
-// }
