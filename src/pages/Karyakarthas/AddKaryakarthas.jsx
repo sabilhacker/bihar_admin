@@ -5,7 +5,7 @@ import { loginUser } from '../../Api/karyakarthas'; // Ensure this path is corre
 const AddKaryakartha = () => {
   const [loginData, setLoginData] = useState({
     phoneNum: '',
-    fcmToken: 'dummyToken',  // Replace with actual FCM token if available
+    epicNumber: '',  // EPIC number should be stored separately
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,12 +45,12 @@ const AddKaryakartha = () => {
           <Box>
             <TextField
               fullWidth
-              label="Full Name"
-              placeholder="Enter Full Name"
-              name="fullName"
+              label="Phone Number"
+              placeholder="Enter Phone Number"
+              name="phoneNum"
               variant="outlined"
               margin="normal"
-              value={loginData.phoneNum} // Assuming phoneNum is the full name field for simplicity
+              value={loginData.phoneNum} 
               onChange={handleChange}
             />
             <TextField
@@ -60,7 +60,7 @@ const AddKaryakartha = () => {
               name="epicNumber"
               variant="outlined"
               margin="normal"
-              value={loginData.fcmToken} // Assuming fcmToken is the epic number field for simplicity
+              value={loginData.epicNumber} 
               onChange={handleChange}
             />
           </Box>
