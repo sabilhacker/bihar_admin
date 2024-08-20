@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-import { baseUrl } from './config';
+import { baseUrl , getToken } from './config';
 
 export const createConstituencies = async (name) => {
     try {
